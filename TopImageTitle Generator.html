@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvas Placeholder Image with Variants</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.7.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    <style>
+      #previewImage {
+        position: fixed;
+        z-index: 1000;
+        pointer-events: none;
+      }
+      .slug-container {
+        margin-top: 1rem;
+        margin-bottom: 1rem;
+      }
+      .button-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+      }
+      #preview {
+        margin-top: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <h2>Wybierz opcję generowania grafiki:</h2>
+    <select id="variantSelect">
+      <option value="4">Opcja 4: TItle pisany w jednej linijce</option>
+      <option value="1">
+        Opcja 1: Wszystko pisane z font-size: 45px. Tekst będzie wycentrowany na
+        środku grafiki.
+      </option>
+      <option value="2">
+        Opcja 2: Pierwsza linijka z font-size: 45px, druga linijka z font-size:
+        30px.
+      </option>
+      <option value="3">
+        Opcja 3: Pierwsza linijka z font-size: 30px, druga linijka z font-size:
+        45px.
+      </option>
+    </select>
+    <br /><br />
+    <label for="backgroundColor">Wybierz kolor tła:</label>
+    <input type="color" id="backgroundColor" value="#FFCCB7" />
+    <br /><br />
+    <label for="textColor">Wybierz kolor tekstu:</label>
+    <input type="color" id="textColor" value="#000000" />
+    <br /><br />
+    <button id="generate">Generate Images</button>
+    <button id="download">Download All as ZIP</button>
+    <div id="preview"></div>
+    <div id="btns"></div>
+    <script>
+      const images = [];
+      const context = {
+        options: {
+          width: 650,
+          backgroundColor: "#FFCCB7",
+          textColor: "#000000",
+          fontFamily: "Poppins, sans-serif",
+          padding: 35, // Odstępy góra-dół w pixelach
+        },
+        name: {
+          value: "20241209",
+          letterCase: "lower",
+        },
+        data: {
+          UK: {
+            "Line 1": "Wall decor for free",
+            "Line 2": "Choose from 4 options",
+          },
+          PL: {
+            "Line 1": "Darmowa dekoracja ścienna",
+            "Line 2": "Wybierz spośród 4 opcji",
+            options: {
+              fontSize: {
+                "Line 1": 43,
+              },
+            },
+          },
+          DE: {
+            "Line 1": "Gratis Wanddekoration",
+            "Line 2": "Wähle aus 4 Optionen",
+          },
+          AT: {
+            "Line 1": "Gratis Wanddekoration",
+            "Line 2": "Wähle aus 4 Optionen",
+          },
+          CHDE: {
+            "Line 1": "Gratis Wanddekoration",
+            "Line 2": "Wähle aus 4 Optionen",
+          },
+          NL: {
+            "Line 1": "Gratis wanddecoratie",
+            "Line 2": "kies uit 4 opties",
+          },
+          FR: {
+            "Line 1": "Décoration murale gratuite",
+            "Line 2": "Choisissez parmi 4 options",
+          },
+          CHFR: {
+            "Line 1": "Décoration murale gratuite",
+            "Line 2": "Choisissez parmi 4 options",
+          },
+          ES: {
+            "Line 1": "Decoración de pared gratis",
+            "Line 2": "Elige entre 4 modelos",
+          },
+          PT: {
+            "Line 1": "Decoração de parede grátis",
+            "Line 2": "Escolha entre 4 modelos",
+            options: {
+              fontSize: {
+                "Line 1": 43,
+              },
+            },
+          },
+          IT: {
+            "Line 1": "Decorazione da Parete Gratis",
+            "Line 2": "Scegli tra 4 Opzioni",
+            options: {
+              fontSize: {
+                "Line 1": 42,
+              },
+            },
+          },
+          DK: {
+            "Line 1": "Gratis vægdekoration",
+            "Line 2": "Vælg en blandt 4 varianter",
+          },
+          NO: {
+            "Line 1": "Gratis veggdekorasjon",
+            "Line 2": "Velg mellom 4 alternativer",
+          },
+          FI: {
+            "Line 1": "Seinäkoriste kaupan päälle",
+            "Line 2": "Valitse neljästä erilaisesta",
+          },
+          SE: {
+            "Line 1": "Få en gratis väggdekoration",
+            "Line 2": "Välj mellan 4 olika",
+          },
+          CZ: {
+            "Line 1": "Nástěnná dekorace zdarma",
+            "Line 2": "Vyberte si ze 4 možností",
+          },
+          SK: {
+            "Line 1": "Nástenná dekorácia zadarmo",
+            "Line 2": "Vyberte si zo 4 možností",
+            options: {
+              fontSize: {
+                "Line 1": 42,
+              },
+            },
+          },
+          HU: {
+            "Line 1": "Ajándék faldekoráció:",
+            "Line 2": "Válassz 4 opció közül",
+          },
+          BEFR: {
+            "Line 1": "Décoration murale gratuite",
+            "Line 2": "Choisissez parmi 4 options",
+          },
+          BENL: {
+            "Line 1": "Gratis wanddecoratie",
+            "Line 2": "kies uit 4 opties",
+          },
+          RO: {
+            "Line 1": "Decorațiune de perete cadou",
+            "Line 2": "Alege dintre 4 opțiuni",
+            options: {
+              fontSize: {
+                "Line 1": 42,
+              },
+            },
+          },
+        },
+      };
+
+      function createPlaceholderImage(
+        { options, name },
+        suffix,
+        text,
+        index,
+        variant
+      ) {
+        const canvas = document.createElement("canvas");
+        const ctx = canvas.getContext("2d");
+        const width = options.width;
+        const padding = options.padding;
+        let lines;
+        const texts = {};
+        for (const key in text) {
+          if (typeof text[key] === "string") {
+            texts[key] = text[key];
+          }
+        }
+        // Wybór wariantu czcionki
+        switch (variant) {
+          case 1:
+            lines = Object.entries(texts).map(([key, value], idx) => {
+              let fontSize = key === "Line 1" ? 45 : 45;
+              if ("options" in text) {
+                fontSize =
+                  idx === 0
+                    ? text["options"].fontSize["Line 1"] || 45
+                    : text["options"].fontSize["Line 2"] || 45;
+              }
+              return { text: value, fontSize };
+            });
+            break;
+          case 2:
+            lines = Object.entries(texts).map(([key, value], idx) => {
+              let fontSize = key === "Line 1" ? 45 : 30;
+              if ("options" in text) {
+                fontSize =
+                  idx === 0
+                    ? text["options"].fontSize["Line 1"] || 45
+                    : text["options"].fontSize["Line 2"] || 30;
+              }
+              return { text: value, fontSize };
+            });
+            break;
+          case 3:
+            lines = Object.entries(texts).map(([key, value], idx) => {
+              let fontSize = key === "Line 1" ? 30 : 45;
+              if ("options" in text) {
+                fontSize =
+                  idx === 0
+                    ? text["options"].fontSize["Line 1"] || 30
+                    : text["options"].fontSize["Line 2"] || 45;
+              }
+              return { text: value, fontSize };
+            });
+            break;
+          case 4:
+            lines = [{ text, fontSize: 45 }];
+            break;
+        }
+
+        // Obliczanie wysokości canvas na podstawie ilości linii i ich rozmiaru
+        let totalHeight = lines.reduce((acc, line) => acc + line.fontSize, 0);
+        canvas.width = 650;
+        canvas.height = totalHeight + 35 * 2; // Ustawienie stałych marginesów góra-dół
+
+        // Ustawienie tła
+        ctx.fillStyle = options.backgroundColor;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        let yPos = 30; // Stały margines od góry do tekstu
+        lines.forEach((line, idx) => {
+          ctx.font = `${line.fontSize}px ${options.fontFamily}`;
+          ctx.fillStyle = options.textColor;
+          ctx.textAlign = "center";
+          ctx.fillText(line.text, canvas.width / 2, yPos + line.fontSize);
+          yPos += line.fontSize + 10;
+        });
+
+        images.push({
+          name: `${suffix.toLowerCase()}${context.name.value}_01.png`,
+          blob: canvas.toDataURL("image/png"),
+        });
+
+        // Dodanie podglądu
+        const img = document.createElement("img");
+        img.src = canvas.toDataURL("image/png");
+        img.alt = `${suffix} preview`;
+        img.style.marginRight = "10px";
+        document.getElementById("preview").appendChild(img);
+      }
+
+      document.getElementById("generate").addEventListener("click", () => {
+        images.length = 0; // Clear the images array
+        document.getElementById("preview").innerHTML = ""; // Clear previous previews
+        const variant = parseInt(
+          document.getElementById("variantSelect").value
+        );
+        context.options.backgroundColor =
+          document.getElementById("backgroundColor").value;
+        context.options.textColor = document.getElementById("textColor").value;
+        Object.keys(context.data).forEach((key, index) => {
+          const text = context.data[key]; // Pobranie danych z data dla danego klucza
+          createPlaceholderImage(context, key, text, index, variant);
+        });
+        alert("Images generated for the selected variant.");
+      });
+
+      document.getElementById("download").addEventListener("click", () => {
+        if (images.length === 0) {
+          alert("No images generated. Please generate images first.");
+          return;
+        }
+        downloadAllImagesAsZip();
+      });
+
+      function downloadAllImagesAsZip() {
+        const zip = new JSZip();
+        images.forEach((image) => {
+          const base64Data = image.blob.split(",")[1];
+          zip.file(`${image.name}`, base64Data, { base64: true });
+        });
+        zip.generateAsync({ type: "blob" }).then((content) => {
+          saveAs(content, "images.zip");
+        });
+      }
+    </script>
+  </body>
+</html>
